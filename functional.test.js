@@ -1,4 +1,4 @@
-const {cnst, variable, add, subtract, multiply, divide, negate} = require('./functional')
+const {cnst, variable, add, subtract, multiply, divide, negate, abs, branch} = require('./functional')
 
 const sfc32 = require("./random-sfc32")
 rng = sfc32(0xCAFEBABE, 0xDEADBEEF, 0xF0CACC1A, 0xB16B00B5)
@@ -16,12 +16,15 @@ numbersStr = ["0.0", "-0.0",
 numbers = numbersStr.map(eval)
 
 function testRange(expected, actualStr) {
-    console.log("Testing " + actualStr)
     actual = eval(actualStr)
     for (const x of numbers) {
         for (const y of numbers) {
             for (const z of numbers) {
-                expect(actual(x, y, z)).toBe(expected(x, y, z))
+                try {
+                    expect(actual(x, y, z)).toBe(expected(x, y, z))
+                } catch (err) {
+                    err.message += actualStr
+                }
             }
         }
     }
@@ -51,6 +54,10 @@ test('simple', () => {
     testRange((x, y, z) => z / y, "divide(variable('z'), variable('y'))")
 
     testRange((x, y, z) => -x, "negate(variable('x'))")
+
+    testRange((x, y, z) => Math.abs(y), "abs(variable('y'))")
+
+    testRange((x, y, z) => z >= 0 ? 319760 : x, "branch(variable('z'), cnst(319760), variable('x'))")
 })
 
 
@@ -58,13 +65,15 @@ test('simple', () => {
 function randomTest(depth, count) {
     // Wow, so ugly
     function generateRandomTest(depth) {
-        const r = depth > 0 ? Math.floor(rng() * 7) : Math.floor(rng() * 2) + 5
-        let left
-        if (r <= 4) {
+        const r = depth > 0 ? Math.floor(rng() * 9) : Math.floor(rng() * 2) + 7
+        let left, middle, right
+        if (r <= 6) {
             left = generateRandomTest(depth - 1)
         }
-        let right
-        if (r <= 3) {
+        if (r == 6) {
+            middle = generateRandomTest(depth - 1)
+        }
+        if (r <= 3 || r == 6) {
             right = generateRandomTest(depth - 1)
         }
         switch (r) {
@@ -79,9 +88,13 @@ function randomTest(depth, count) {
             case 4:
                 return {a : "negate(" + left.a + ")", e : "(-" + left.e + ")"}
             case 5:
+                return {a : "abs(" + left.a + ")", e : "(Math.abs(" + left.e + "))"}
+            case 6:
+                return {a : "branch(" + left.a + ", " + middle.a + ", " + right.a + ")", e : "(" + left.e + "?" + middle.e + ":" + right.e + ")"}
+            case 7:
                 c = rng() * 200001 - 100000
                 return {a : "cnst(" + c + ")", e : "(" + c + ")"}
-            case 6:
+            case 8:
                 vars = ['x', 'y', 'z']
                 v = vars[Math.floor(rng() * 3)]
                 return {a : "variable('" + v + "')", e : "(" + v + ")"}
