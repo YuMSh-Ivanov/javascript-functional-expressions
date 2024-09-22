@@ -23,10 +23,9 @@ function testRange(expected, actualStr) {
         for (const y of numbers) {
             for (const z of numbers) {
                 try {
-                    // console.log(expected + ":" + actual(x, y, z));
-                    expect(actual(x, y, z)).toBe(expected(x, y, z))
+                    expect(actual(x, y, z)).toBe(expected(x, y, z));
                 } catch (err) {
-                    err.message += "\n" + actualStr
+                    err.message += "\n" + actualStr + "\n[" + x + ", " + y + ", " + z + "]";
                     throw err
                 }
             }
