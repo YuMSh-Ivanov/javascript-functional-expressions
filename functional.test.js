@@ -26,7 +26,7 @@ function testRange(expected, actualStr) {
                     // console.log(expected + ":" + actual(x, y, z));
                     expect(actual(x, y, z)).toBe(expected(x, y, z))
                 } catch (err) {
-                    err.message += actualStr
+                    err.message += "\n" + actualStr
                     throw err
                 }
             }
