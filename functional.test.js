@@ -93,7 +93,7 @@ function randomTest(depth, count) {
             case 5:
                 return {a : "abs(" + left.a + ")", e : "(Math.abs(" + left.e + "))"}
             case 6:
-                return {a : "branch(" + left.a + ", " + middle.a + ", " + right.a + ")", e : "(" + left.e + "?" + middle.e + ":" + right.e + ")"}
+                return {a : "branch(" + left.a + ", " + middle.a + ", " + right.a + ")", e : "(" + left.e + ">= 0 ?" + middle.e + ":" + right.e + ")"}
             case 7:
                 const c = rng() * 200001 - 100000
                 return {a : "cnst(" + c + ")", e : "(" + c + ")"}
