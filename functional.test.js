@@ -1,10 +1,12 @@
+"use strict";
+
 const {cnst, variable, add, subtract, multiply, divide, negate, abs, branch} = require('./functional')
 
 const sfc32 = require("./random-sfc32")
-rng = sfc32(0xCAFEBABE, 0xDEADBEEF, 0xF0CACC1A, 0xB16B00B5)
+const rng = sfc32(0xCAFEBABE, 0xDEADBEEF, 0xF0CACC1A, 0xB16B00B5)
 
 
-numbersStr = ["0.0", "-0.0",
+const numbersStr = ["0.0", "-0.0",
            "1000", "-1000",
            "0.001", "-0.001",
            "Number.MAX_SAFE_INTEGER", "Number.MIN_SAFE_INTEGER", "Number.MAX_SAFE_INTEGER + 1", "Number.MIN_SAFE_INTEGER - 1",
@@ -13,17 +15,19 @@ numbersStr = ["0.0", "-0.0",
            "Number.EPSILON", "-Number.EPSILON",
            "Number.POSITIVE_INFINITY", "Number.NEGATIVE_INFINITY", "Number.NaN"]
 
-numbers = numbersStr.map(eval)
+const numbers = numbersStr.map(eval)
 
 function testRange(expected, actualStr) {
-    actual = eval(actualStr)
+    const actual = eval(actualStr)
     for (const x of numbers) {
         for (const y of numbers) {
             for (const z of numbers) {
                 try {
+                    // console.log(expected + ":" + actual(x, y, z));
                     expect(actual(x, y, z)).toBe(expected(x, y, z))
                 } catch (err) {
                     err.message += actualStr
+                    throw err
                 }
             }
         }
@@ -92,11 +96,11 @@ function randomTest(depth, count) {
             case 6:
                 return {a : "branch(" + left.a + ", " + middle.a + ", " + right.a + ")", e : "(" + left.e + "?" + middle.e + ":" + right.e + ")"}
             case 7:
-                c = rng() * 200001 - 100000
+                const c = rng() * 200001 - 100000
                 return {a : "cnst(" + c + ")", e : "(" + c + ")"}
             case 8:
-                vars = ['x', 'y', 'z']
-                v = vars[Math.floor(rng() * 3)]
+                const vars = ['x', 'y', 'z']
+                const v = vars[Math.floor(rng() * 3)]
                 return {a : "variable('" + v + "')", e : "(" + v + ")"}
         }
     }
