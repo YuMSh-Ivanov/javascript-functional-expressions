@@ -34,7 +34,7 @@ function testRange(expected, actualStr) {
 }
 
 test('constants', () => {
-    for (const i in numbers) {
+    for (let i = 0; i < numbers.length; i++) {
         testRange((x, y, z) => numbers[i], "cnst(" + numbersStr[i] + ")")
     }
 })
